@@ -1,27 +1,16 @@
 #!/bin/bash
-set -e
-IP=$1
+echo "4tify-Linux"
+echo "3. Partition"
+
 cd support_files/4.3/File_System
-/usr/bin/expect <(cat << EOF
-set timeout -1
-spawn ssh -o StrictHostKeyChecking=no -p 22 root@$IP
-expect "root@$IP's password:"
-send "alpine\r"
-expect "#"
-send "TwistedMind2 -d1 3221225472 -s2 879124480 -d2 max\r"
-expect "#"
-send "exit\r"
-expect eof
-)
+ssh -p 2222 root@127.0.0.1 "TwistedMind2 -d1 3221225472 -s2 879124480 -d2 max"
 sleep 2
-echo "Fetching Patch File"
-srcdirs=$(ssh -n -p 22 root@$IP "find / -name '*TwistedMind2-*'")
+echo "Fetching Patch File..."
+srcdirs=$(ssh -p 2222 root@127.0.0.1 "ls /*TwistedMind2*")
 echo "$srcdirs"
-/usr/bin/expect <(cat << EOF
-set timeout -1
-spawn scp -P 22 -o StrictHostKeyChecking=no root@$IP:$srcdirs $(pwd)
-expect "root@$IP's password:"
-send "alpine\r"
-expect eof
-)
+expect "
+spawn scp -P 2222 -o StrictHostKeyChecking=no root@127.0.0.1:$srcdirs .
+expect \"root@127.0.0.1's password:\"
+send \"alpine\r\"
+expect eof"
 echo "Done!"
